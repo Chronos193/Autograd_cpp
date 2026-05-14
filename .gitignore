@@ -1,0 +1,7 @@
+.vscode/
+pointers/
+*.o
+*.exe
+*.dot
+*.png
+*.out
