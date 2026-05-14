@@ -1,66 +1,66 @@
 #include "Value.h"
 
 // Constructors
-Value::Value(float data): data(data)
+ValueImpl::ValueImpl(float data): data(data)
 {
 
 }
 
-Value::Value(float data, std::vector<std::shared_ptr<Value>> children, std::string op): data(data), children_arr(children), op(op)
+ValueImpl::ValueImpl(float data, std::vector<std::shared_ptr<ValueImpl>> children, std::string op): data(data), children_arr(children), op(op)
 {
 
 }
 
 // Getters
-float Value::get_data() const
+float ValueImpl::get_data() const
 {
     return data;
 }
 
-float Value::get_grad() const
+float ValueImpl::get_grad() const
 {
     return grad;
 }
 
-const std::vector<std::shared_ptr<Value>>&  Value::get_childen() const
+const std::vector<std::shared_ptr<ValueImpl>>&  ValueImpl::get_childen() const
 {
     return children_arr;
 }
 
-std::string Value::get_op() const
+std::string ValueImpl::get_op() const
 {
     return op;
 }
 
 // Setters
-void Value::set_data(float data)
+void ValueImpl::set_data(float data)
 {
     this->data = data;
 }
 
-void Value::set_grad(float grad)
+void ValueImpl::set_grad(float grad)
 {
     this->grad = grad;
 }
 
 // Representation
-std::ostream& operator<<(std::ostream& os, const Value& v) {
-    os << "Value(data=" << v.data << ", grad=" << v.grad << ")";
-    return os;
-}
+// std::ostream& operator<<(std::ostream& os, const ValueImpl& v) {
+//     os << "ValueImpl(data=" << v.data << ", grad=" << v.grad << ")";
+//     return os;
+// }
 
 // BackPropagation Implementation by DFS Topological Sort
-void Value::backward()
+void ValueImpl::backward()
 {
     std::function<void(
-        std::shared_ptr<Value>,
-        std::unordered_set<std::shared_ptr<Value>>&,
-        std::vector<std::shared_ptr<Value>>&
+        std::shared_ptr<ValueImpl>,
+        std::unordered_set<std::shared_ptr<ValueImpl>>&,
+        std::vector<std::shared_ptr<ValueImpl>>&
     )> build_topo;
-    std::unordered_set<std::shared_ptr<Value>> visited;
-    std::vector<std::shared_ptr<Value>> topo;
+    std::unordered_set<std::shared_ptr<ValueImpl>> visited;
+    std::vector<std::shared_ptr<ValueImpl>> topo;
     auto node = shared_from_this();
-    build_topo = [&](std::shared_ptr<Value> node, std::unordered_set<std::shared_ptr<Value>>& visited, std::vector<std::shared_ptr<Value>>& topo){
+    build_topo = [&](std::shared_ptr<ValueImpl> node, std::unordered_set<std::shared_ptr<ValueImpl>>& visited, std::vector<std::shared_ptr<ValueImpl>>& topo){
         // If we haven't visited this node yet
         if (visited.find(node) == visited.end()) {
             visited.insert(node); // Mark as visited
@@ -85,17 +85,17 @@ void Value::backward()
 }
 
 //Arithmethic implementations
-std::shared_ptr<Value> Value::operator+ (std::shared_ptr<Value> other)
+std::shared_ptr<ValueImpl> ValueImpl::operator+ (std::shared_ptr<ValueImpl> other)
 {
     float new_data = this->data + other->get_data();
-    std::vector<std::shared_ptr<Value>> children;
-    std::shared_ptr<Value> child1 = shared_from_this();
-    std::shared_ptr<Value> child2 = other;
+    std::vector<std::shared_ptr<ValueImpl>> children;
+    std::shared_ptr<ValueImpl> child1 = shared_from_this();
+    std::shared_ptr<ValueImpl> child2 = other;
     children.push_back(child1);
     children.push_back(child2);
-    std::shared_ptr<Value> out = std::make_shared<Value> (new_data, children , op);
+    std::shared_ptr<ValueImpl> out = std::make_shared<ValueImpl> (new_data, children , op);
     out -> op = '+';
-    std::weak_ptr<Value> out_weak = out;     // As here if we pass shared pointer to _backward the _backward will own out and out will own _backward so memory leak will happen
+    std::weak_ptr<ValueImpl> out_weak = out;     // As here if we pass shared pointer to _backward the _backward will own out and out will own _backward so memory leak will happen
     out -> _backward = [child1, child2, out_weak](){
         if(auto out_ptr = out_weak.lock())
         {
@@ -108,18 +108,17 @@ std::shared_ptr<Value> Value::operator+ (std::shared_ptr<Value> other)
     return out;
 }
 
-Value Value::operator* (Value other)
+std::shared_ptr<ValueImpl> ValueImpl::operator* (std::shared_ptr<ValueImpl> other)
 {
-    auto other_ptr = std::make_shared<Value>(other);
-    float new_data = this->data * other_ptr->get_data();
-    std::vector<std::shared_ptr<Value>> children;
-    std::shared_ptr<Value> child1 = shared_from_this();
-    std::shared_ptr<Value> child2 = other_ptr;
+    float new_data = this->data * other->get_data();
+    std::vector<std::shared_ptr<ValueImpl>> children;
+    std::shared_ptr<ValueImpl> child1 = shared_from_this();
+    std::shared_ptr<ValueImpl> child2 = other;
     children.push_back(child1);
     children.push_back(child2);
-    std::shared_ptr<Value> out = std::make_shared<Value> (new_data, children , op);
+    std::shared_ptr<ValueImpl> out = std::make_shared<ValueImpl> (new_data, children , op);
     out -> op = '*';
-    std::weak_ptr<Value> out_weak = out;     // As here if we pass shared pointer to _backward the _backward will own out and out will own _backward so memory leak will happen
+    std::weak_ptr<ValueImpl> out_weak = out;     // As here if we pass shared pointer to _backward the _backward will own out and out will own _backward so memory leak will happen
     out -> _backward = [child1, child2, out_weak](){
         if(auto out_ptr = out_weak.lock())
         {
@@ -129,18 +128,18 @@ Value Value::operator* (Value other)
             child2->set_grad(grad2); 
         }
     };
-    return *out;
+    return out;
 }
 
-std::shared_ptr<Value> Value::tanh()
+std::shared_ptr<ValueImpl> ValueImpl::tanh()
 {
     float new_data = std::tanh(this->data);
-    std::vector<std::shared_ptr<Value>> children;
-    std::shared_ptr<Value> child1 = shared_from_this();
+    std::vector<std::shared_ptr<ValueImpl>> children;
+    std::shared_ptr<ValueImpl> child1 = shared_from_this();
     children.push_back(child1);
-    std::shared_ptr<Value> out = std::make_shared<Value> (new_data, children , op);
+    std::shared_ptr<ValueImpl> out = std::make_shared<ValueImpl> (new_data, children , op);
     out -> op = "tanh";
-    std::weak_ptr<Value> out_weak = out;     // As here if we pass shared pointer to _backward the _backward will own out and out will own _backward so memory leak will happen
+    std::weak_ptr<ValueImpl> out_weak = out;     // As here if we pass shared pointer to _backward the _backward will own out and out will own _backward so memory leak will happen
     out -> _backward = [child1, out_weak](){
         if (auto out_ptr = out_weak.lock())
         {

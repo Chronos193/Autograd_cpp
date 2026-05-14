@@ -1,9 +1,9 @@
 #include "visualize.h"
 
 namespace autograd::utils {
-    void build_trace(std::shared_ptr<Value> root, 
-                 std::set<std::shared_ptr<Value>>& nodes, 
-                 std::set<std::pair<std::shared_ptr<Value>, std::shared_ptr<Value>>>& edges) 
+    void build_trace(std::shared_ptr<ValueImpl> root, 
+                 std::set<std::shared_ptr<ValueImpl>>& nodes, 
+                 std::set<std::pair<std::shared_ptr<ValueImpl>, std::shared_ptr<ValueImpl>>>& edges) 
     {
         // If we haven't seen this node yet
         if (nodes.find(root) == nodes.end()) {
@@ -16,12 +16,13 @@ namespace autograd::utils {
     }
 
     // Function to generate the Graphviz file
-    void draw_graph(std::shared_ptr<Value> root, const std::string& filename) 
+    void draw_graph(Value root, const std::string& filename) 
     {
-        std::set<std::shared_ptr<Value>> nodes;
-        std::set<std::pair<std::shared_ptr<Value>, std::shared_ptr<Value>>> edges;
+        std::shared_ptr<ValueImpl> root_ptr = root._return_shared_pointer();
+        std::set<std::shared_ptr<ValueImpl>> nodes;
+        std::set<std::pair<std::shared_ptr<ValueImpl>, std::shared_ptr<ValueImpl>>> edges;
         
-        build_trace(root, nodes, edges);
+        build_trace(root_ptr, nodes, edges);
 
         std::ofstream out(filename);
         out << "digraph G {\n";
@@ -48,11 +49,13 @@ namespace autograd::utils {
         out.close();
         std::cout << "Graph saved to " << filename << std::endl;
     }
-    void return_all_nodes(std::shared_ptr<Value> node, std::vector<std::shared_ptr<Value>>& node_arr)
+    void return_all_nodes(Value node, std::vector<Value>& node_arr)
     {
-        auto children = node->get_childen();
-        for(const auto& child: children)
+        std::shared_ptr<ValueImpl> node_ptr = node._return_shared_pointer();
+        auto children = node_ptr->get_childen();
+        for(const auto& child_ptr: children)
         {
+            Value child(child_ptr);
             return_all_nodes(child, node_arr);
         }
         node_arr.push_back(node);

@@ -1,42 +1,48 @@
 #include "Value.h"
 #include "visualize.h"
 
-// std::shared_ptr<Value> perceptron()
-// {
-//     std::shared_ptr<Value> x1 = std::make_shared<Value>(0.3);
-//     std::shared_ptr<Value> x2 = std::make_shared<Value>(0.5);
-//     std::shared_ptr<Value> w1 = std::make_shared<Value>(0.4);
-//     std::shared_ptr<Value> w2 = std::make_shared<Value>(0.6);
-//     std::shared_ptr<Value> weighted_sum;
-//     std::shared_ptr<Value> output;
-//     weighted_sum = w1 * w2;
-//     output = weighted_sum->tanh();    
-//     return output;
-// }
-
-std::shared_ptr<Value> Multiply()
+std::shared_ptr<ValueImpl> perceptron()
 {
-    Value x1(0.3), x2(0.5), w1(0.4), w2(0.6);
-    Value output = x1 * w1;
-    std::shared_ptr<Value> output_ptr = std::make_shared<Value>(output);
-    return output_ptr;
+    std::shared_ptr<ValueImpl> x1 = std::make_shared<ValueImpl>(0.3);
+    std::shared_ptr<ValueImpl> x2 = std::make_shared<ValueImpl>(0.5);
+    std::shared_ptr<ValueImpl> w1 = std::make_shared<ValueImpl>(0.4);
+    std::shared_ptr<ValueImpl> w2 = std::make_shared<ValueImpl>(0.6);
+    std::shared_ptr<ValueImpl> weighted_sum;
+    std::shared_ptr<ValueImpl> output;
+    weighted_sum = *w1 * w2;
+    output = weighted_sum->tanh();    
+    return output;
 }
 
-int main()
-{
-    std::unordered_set<std::shared_ptr<Value>> visited;
-    std::vector<std::shared_ptr<Value>> topo;
-    std::vector<std::shared_ptr<Value>> nodes;
-    // auto output = perceptron();
-    auto output = Multiply();
-    output->backward();
-    // autograd::utils::draw_graph(output, "my_network.dot");
+// std::shared_ptr<ValueImpl> Multiply()
+// {
+//     ValueImpl x1(0.3), x2(0.5), w1(0.4), w2(0.6);
+//     ValueImpl output = x1 * w1;
+//     std::shared_ptr<ValueImpl> output_ptr = std::make_shared<ValueImpl>(output);
+//     return output_ptr;
+// }
 
-    autograd::utils::return_all_nodes(output, nodes);
+int main() {
 
-    for(auto node: nodes)
+    std::cout << "Starting Execution" << std::endl;
+
+    Value x1(0.3), x2(0.5), w1(0.4), w2(0.6);
+    
+    // This is now valid, readable C++!
+    Value output = (w1 * x1 + w2 * x2).tanh();
+    
+    output.backward();
+    
+    autograd::utils::draw_graph(output);
+
+    std::vector<Value> node_arr;
+
+    autograd::utils::return_all_nodes(output, node_arr);
+
+    for(auto ele:node_arr)
     {
-        std::cout << *node << std::endl;
+        std::cout << ele << std::endl;
     }
+    
     return 0;
 }
