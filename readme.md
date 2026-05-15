@@ -1,6 +1,6 @@
 # Micrograd in C++
 
-This project is my attempt to implement :contentReference[oaicite:0]{index=0} by :contentReference[oaicite:1]{index=1} in C++.
+This project is my attempt to implement an automatic differentiation engine and tools to make neural network in C++.
 
 The goal of this implementation is to understand how automatic differentiation and backpropagation work under the hood by recreating the core ideas of micrograd from scratch.
 
