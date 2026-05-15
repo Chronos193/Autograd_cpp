@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall
 
-OBJS = main.o Value.o Visualize.o
+OBJS = main.o Value.o Visualize.o perceptron.o
 TARGET = my_autograd.exe
 EXTRA_DOT = my_network.dot 
 EXTRA_PNG = my_network.png

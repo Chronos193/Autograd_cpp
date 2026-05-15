@@ -60,4 +60,18 @@ namespace autograd::utils {
         }
         node_arr.push_back(node);
     }
+
+    std::vector<std::pair<Value, Value>> zip(std::vector<Value> v1, std::vector<Value> v2)
+    {
+        std::vector<std::pair<Value, Value>> zip_arr;
+        if (v1.size() != v2.size()) {
+            throw std::runtime_error("Shape of v1 and v2 is not same.");
+        }
+        for(size_t i=0;i<v1.size();i++)
+        {
+            std::pair<Value, Value> p(v1[i], v2[i]);
+            zip_arr.push_back(p);
+        }
+        return zip_arr;
+    }
 }

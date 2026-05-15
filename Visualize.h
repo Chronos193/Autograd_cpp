@@ -13,6 +13,8 @@ namespace autograd::utils {
 
     // Function to fill an array with all nodes of the graph
     void return_all_nodes(Value node, std::vector<Value>& node_arr);
+
+    std::vector<std::pair<Value, Value>> zip(std::vector<Value> v1, std::vector<Value> v2);
 }
 
 #endif

@@ -62,6 +62,9 @@ class Value
 
     public:
         // Construuctors
+        Value () : impl(std::make_shared<ValueImpl>(0.0f))
+        {
+        }
         Value(float data) : impl(std::make_shared<ValueImpl>(data))
         {
         }
@@ -89,6 +92,10 @@ class Value
         {
             impl->set_data(data);
         }
+        void set_grad(float grad)
+        {
+            impl->set_grad(grad);
+        }
 
         // Representation
         friend std::ostream& operator<<(std::ostream& os, const Value& v)
@@ -105,31 +112,37 @@ class Value
 
         // Operator overrinde
 
-        Value operator+ (const Value &other)
+        Value operator+(const Value& other) const
         {
             return Value(*impl + other._return_shared_pointer());
         }
-        Value operator- (const Value &other)
+
+        Value operator-(const Value& other) const
         {
             return Value(*impl - other._return_shared_pointer());
         }
-        Value operator* (const Value &other)
+
+        Value operator*(const Value& other) const
         {
             return Value(*impl * other._return_shared_pointer());
         }
-        Value operator/ (const Value &other)
+
+        Value operator/(const Value& other) const
         {
             return Value(*impl / other._return_shared_pointer());
         }
-        Value relu()
+
+        Value relu() const
         {
             return Value(impl->relu());
         }
-        Value tanh ()
+
+        Value tanh() const
         {
             return Value(impl->tanh());
         }
-        Value exp ()
+
+        Value exp() const
         {
             return Value(impl->exp());
         }
