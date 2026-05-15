@@ -99,9 +99,36 @@ std::shared_ptr<ValueImpl> ValueImpl::operator+ (std::shared_ptr<ValueImpl> othe
     out -> _backward = [child1, child2, out_weak](){
         if(auto out_ptr = out_weak.lock())
         {
-            float grad1 = 1.0f * out_ptr->get_grad();
-            float grad2 = 1.0f * out_ptr->get_grad();
+            float grad1 = child1->get_grad(); 
+            grad1 += 1.0f * out_ptr->get_grad();
             child1->set_grad(grad1);
+            float grad2 = child2->get_grad();  
+            grad2 += 1.0f * out_ptr->get_grad();
+            child2->set_grad(grad2); 
+        }
+    };
+    return out;
+}
+
+std::shared_ptr<ValueImpl> ValueImpl::operator- (std::shared_ptr<ValueImpl> other)
+{
+    float new_data = this->data - other->get_data();
+    std::vector<std::shared_ptr<ValueImpl>> children;
+    std::shared_ptr<ValueImpl> child1 = shared_from_this();
+    std::shared_ptr<ValueImpl> child2 = other;
+    children.push_back(child1);
+    children.push_back(child2);
+    std::shared_ptr<ValueImpl> out = std::make_shared<ValueImpl> (new_data, children , op);
+    out -> op = '-';
+    std::weak_ptr<ValueImpl> out_weak = out;     // As here if we pass shared pointer to _backward the _backward will own out and out will own _backward so memory leak will happen
+    out -> _backward = [child1, child2, out_weak](){
+        if(auto out_ptr = out_weak.lock())
+        {
+            float grad1 = child1->get_grad(); 
+            grad1 += 1.0f * out_ptr->get_grad();
+            child1->set_grad(grad1);
+            float grad2 = child2->get_grad();  
+            grad2 += (-1.0f) * out_ptr->get_grad();
             child2->set_grad(grad2); 
         }
     };
@@ -122,9 +149,36 @@ std::shared_ptr<ValueImpl> ValueImpl::operator* (std::shared_ptr<ValueImpl> othe
     out -> _backward = [child1, child2, out_weak](){
         if(auto out_ptr = out_weak.lock())
         {
-            float grad1 = child2->get_data() * out_ptr->get_grad();
-            float grad2 = child1->get_data() * out_ptr->get_grad();
+            float grad1 = child1->get_grad(); 
+            grad1 += child2->get_data() * out_ptr->get_grad();
             child1->set_grad(grad1);
+            float grad2 = child2->get_grad(); 
+            grad2 += child1->get_data() * out_ptr->get_grad();
+            child2->set_grad(grad2); 
+        }
+    };
+    return out;
+}
+
+std::shared_ptr<ValueImpl> ValueImpl::operator/ (std::shared_ptr<ValueImpl> other)
+{
+    float new_data = this->data / other->get_data();
+    std::vector<std::shared_ptr<ValueImpl>> children;
+    std::shared_ptr<ValueImpl> child1 = shared_from_this();
+    std::shared_ptr<ValueImpl> child2 = other;
+    children.push_back(child1);
+    children.push_back(child2);
+    std::shared_ptr<ValueImpl> out = std::make_shared<ValueImpl> (new_data, children , op);
+    out -> op = '/';
+    std::weak_ptr<ValueImpl> out_weak = out;     // As here if we pass shared pointer to _backward the _backward will own out and out will own _backward so memory leak will happen
+    out -> _backward = [child1, child2, out_weak](){
+        if(auto out_ptr = out_weak.lock())
+        {
+            float grad1 = child1->get_grad(); 
+            grad1 += (1/child2->get_data()) * out_ptr->get_grad();
+            child1->set_grad(grad1);
+            float grad2 = child2->get_grad(); 
+            grad2 += -((out_ptr->get_data())*(1/child2->get_data())) * out_ptr->get_grad();
             child2->set_grad(grad2); 
         }
     };
@@ -144,7 +198,51 @@ std::shared_ptr<ValueImpl> ValueImpl::tanh()
         if (auto out_ptr = out_weak.lock())
         {
             float t = (out_ptr->get_data());
-            float grad1 = 1-t*t;
+            float grad1 = child1->get_grad(); 
+            grad1 += (1-t*t) * out_ptr->get_grad() ;
+            child1->set_grad(grad1);
+        }
+    };
+    return out;
+}
+
+std::shared_ptr<ValueImpl> ValueImpl::relu()
+{
+    float new_data;
+    if (this->data >= 0) {new_data = (this->data);}
+    else {new_data = 0;}
+    std::vector<std::shared_ptr<ValueImpl>> children;
+    std::shared_ptr<ValueImpl> child1 = shared_from_this();
+    children.push_back(child1);
+    std::shared_ptr<ValueImpl> out = std::make_shared<ValueImpl> (new_data, children , op);
+    out -> op = "relu";
+    std::weak_ptr<ValueImpl> out_weak = out;     // As here if we pass shared pointer to _backward the _backward will own out and out will own _backward so memory leak will happen
+    out -> _backward = [child1, out_weak](){
+        if (auto out_ptr = out_weak.lock())
+        {
+            float grad1 = child1->get_grad(); 
+            if (out_ptr->get_data() > 0) {grad1 += 1.0f * out_ptr->get_grad() ;}
+            else {grad1 += 0.0f;}
+            child1->set_grad(grad1);
+        }
+    };
+    return out;
+}
+
+std::shared_ptr<ValueImpl> ValueImpl::exp()
+{
+    float new_data = std::exp(this->data);
+    std::vector<std::shared_ptr<ValueImpl>> children;
+    std::shared_ptr<ValueImpl> child1 = shared_from_this();
+    children.push_back(child1);
+    std::shared_ptr<ValueImpl> out = std::make_shared<ValueImpl> (new_data, children , op);
+    out -> op = "exp";
+    std::weak_ptr<ValueImpl> out_weak = out;     // As here if we pass shared pointer to _backward the _backward will own out and out will own _backward so memory leak will happen
+    out -> _backward = [ child1, out_weak](){
+        if (auto out_ptr = out_weak.lock())
+        {
+            float grad1 = child1->get_grad(); 
+            grad1 += out_ptr->get_data() * out_ptr->get_grad() ;
             child1->set_grad(grad1);
         }
     };

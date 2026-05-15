@@ -25,11 +25,11 @@ std::shared_ptr<ValueImpl> perceptron()
 int main() {
 
     std::cout << "Starting Execution" << std::endl;
-
-    Value x1(0.3), x2(0.5), w1(0.4), w2(0.6);
+    // ax+b a=10.0 b=10.0
+    Value a(-2), b(3);
     
     // This is now valid, readable C++!
-    Value output = (w1 * x1 + w2 * x2).tanh();
+    Value output = a.relu();
     
     output.backward();
     

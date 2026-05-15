@@ -46,8 +46,12 @@ class ValueImpl: public std::enable_shared_from_this<ValueImpl>
 
     //Arithmethic implementations
         std::shared_ptr<ValueImpl> operator+ (std::shared_ptr<ValueImpl> other);
+        std::shared_ptr<ValueImpl> operator- (std::shared_ptr<ValueImpl> other);
         std::shared_ptr<ValueImpl> operator* (std::shared_ptr<ValueImpl> other);
+        std::shared_ptr<ValueImpl> operator/ (std::shared_ptr<ValueImpl> other);
+        std::shared_ptr<ValueImpl> relu();
         std::shared_ptr<ValueImpl> tanh();
+        std::shared_ptr<ValueImpl> exp();
 };
 
 // Writing the wrapper around Value Implementaion
@@ -105,13 +109,29 @@ class Value
         {
             return Value(*impl + other._return_shared_pointer());
         }
+        Value operator- (const Value &other)
+        {
+            return Value(*impl - other._return_shared_pointer());
+        }
         Value operator* (const Value &other)
         {
             return Value(*impl * other._return_shared_pointer());
         }
+        Value operator/ (const Value &other)
+        {
+            return Value(*impl / other._return_shared_pointer());
+        }
+        Value relu()
+        {
+            return Value(impl->relu());
+        }
         Value tanh ()
         {
             return Value(impl->tanh());
+        }
+        Value exp ()
+        {
+            return Value(impl->exp());
         }
 };
 
