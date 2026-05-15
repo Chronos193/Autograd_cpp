@@ -28,4 +28,4 @@ This is a learning project and is still under development. The implementation ma
 
 ## Reference
 
-Original micrograd by :contentReference[oaicite:2]{index=2}: [GitHub repository](https://github.com/karpathy/micrograd)
+Original micrograd by : [GitHub repository](https://github.com/karpathy/micrograd)
