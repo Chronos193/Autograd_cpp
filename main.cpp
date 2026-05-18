@@ -2,21 +2,44 @@
 #include "visualize.h"
 #include "perceptron.h"
 
-std::vector<std::pair<std::vector<Value>, Value>> data() 
+std::vector<std::pair<std::vector<Value>, Value>> data()
 {
     std::vector<std::pair<std::vector<Value>, Value>> data_arr;
-    std::vector<std::vector<Value>> X_arr;
-    std::vector<Value> X_1;
-    std::vector<Value> X_2;
-    X_1.push_back(2); X_arr.push_back(X_1);
-    X_2.push_back(1); X_arr.push_back(X_2); // X_arr = [[2], [1]]
 
-    data_arr.emplace_back(X_arr[0],4);
-    data_arr.emplace_back(X_arr[1],2);
+    data_arr.emplace_back(
+        std::vector<Value>{2, 3},
+        5
+    );
+
+    data_arr.emplace_back(
+        std::vector<Value>{1, 4},
+        5
+    );
+
+    data_arr.emplace_back(
+        std::vector<Value>{5, 2},
+        7
+    );
+
+    data_arr.emplace_back(
+        std::vector<Value>{3, 1},
+        4
+    );
+
+    data_arr.emplace_back(
+        std::vector<Value>{0, 6},
+        6
+    );
+
+    data_arr.emplace_back(
+        std::vector<Value>{7, 2},
+        9
+    );
+
     return data_arr;
 }
 
-Value mse_loss(std::vector<std::pair<Value, Value>>& arr)
+Value mse_loss(const std::vector<std::pair<Value, Value>>& arr)
 {
     Value loss(0);
     for(auto ele: arr)
@@ -38,44 +61,46 @@ Value mse_loss(Value y, Value y_pred)
 
 int main() {
     //Hyperparameters
-    float lr = 0.1;
-    int epochs = 150;
+    float lr = 0.01;
+    int epochs = 13000;
+    int input = 2;
+    int layer1 = 4;
+    int layer2 = 4;
+    int output = 1;
     //
-    Perceptron p1(1);
-    std::vector<std::pair<std::vector<Value>, Value>> data_arr = data();
-    std::vector<Value> Y, Y_pred;
-    Value x_val(1), y_val(2);
-    std::vector<Value> X_test;
-    X_test.push_back(x_val);
-    for(auto data: data_arr)
+    NN n1(input, {"tanh", "tanh", "linear"}, {layer1, layer2, output});
+    auto data_vec = data();
+    for (int i=0;i<epochs;i++)
     {
-        Y.push_back(data.second);
-    }
-    for (int epoch=0 ;epoch<epochs ; epoch++)
-    {
-        p1.zero_grad(); // Clear gradients from prev steps
-        Y_pred.clear(); // Clear after each epoch
-            for(auto data: data_arr)
-            {
-                Y_pred.push_back(p1.forward(data.first)); // Forward pass
-            }
-        auto zipped_arr = autograd::utils::zip(Y, Y_pred);
-        auto loss = mse_loss(zipped_arr); // Calculate loss
-        std::cout << loss << std::endl;
-        loss.backward(); // Backward pass
-        p1.train(lr); // update 
-        if(epoch == (epochs-1))
+        std::vector<Value> Y;
+        std::vector<Value> Y_pred;
+        // ================Forward Pass============
+        for(auto& data: data_vec)
         {
+            std::vector<Value> outputs;
+            outputs = n1.forward(data.first);
+            Y_pred.push_back(outputs[0]);
+            Y.push_back(data.second);
+        }
+        Value loss = mse_loss(autograd::utils::zip(Y_pred, Y));
+        // =====================Backward Pass==============
+        n1.zero_grad();
+        loss.backward();
+        n1.train(lr);
+        // ==============Printing===============
+        if (i%1000 == 0)
+        {
+            std::cout << loss << std::endl;
             autograd::utils::draw_graph(loss);
         }
-        // Validation Prediction
-        if ((epoch%10 == 1) || (epoch == (epochs-1)))
-        {
-            auto y_pred_val = p1.forward(X_test);
-            std::cout<< "Validation pred on value 1 (should be 2): " << y_pred_val << std::endl;
-            std::cout<< "Validation loss : " << mse_loss(y_val, y_pred_val) << std::endl;
-            p1.info();
-        }
     }
+    // Validation
+    std::vector<Value> val_in = {3,4};
+    Value y(7);
+    std::vector<Value> val_out;
+    val_out = n1.forward(val_in);
+    Value val_loss = mse_loss(val_out[0], y); 
+    std::cout << std::endl;
+    std:: cout << "Validation output = " << val_out[0] << ", Validation Loss = " <<  val_loss << std::endl;
     return 0;
 }

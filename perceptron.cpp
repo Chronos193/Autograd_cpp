@@ -1,7 +1,12 @@
 #include "perceptron.h"
 
+// Perceptron
 Value Perceptron::forward(const std::vector<Value>& inputs)
 {
+    if(inputs.size() != weights.size())
+    {
+        throw std::runtime_error("Input size mismatch");
+    }
     Value sum = bias;
     for (size_t i = 0; i < weights.size(); i++)
         sum = sum + inputs[i] * weights[i];
@@ -11,7 +16,7 @@ Value Perceptron::forward(const std::vector<Value>& inputs)
 void Perceptron::train(float lr)
 {
     float weight_data, weight_grad;
-    for(auto weight : weights)
+    for(auto& weight : weights)
     {
         weight_data = weight.get_data();
         weight_grad = weight.get_grad();
@@ -35,12 +40,100 @@ void Perceptron::zero_grad() {
 
 void Perceptron::info()
 {
-    std::cout << "Info Below:- " << std::endl;
     std::cout << "The weights are: " << std::endl;
     for (auto& w : weights) {
-        std::cout << w << std::endl;
+        std::cout << w << " ";
     }
+    std::cout << std::endl;
     // Reset bias
     std::cout << "The bias are: " << std::endl;
     std::cout << bias << std::endl;
 }
+
+// Layer
+
+std::vector<Value> Layer::forward(const std::vector<Value>& inputs)
+{
+    std::vector<Value> outputs;
+    Value temp;
+    for( auto& p : p_vec)
+    {
+        temp = p.forward(inputs);
+        if(activation == "linear")
+        {
+            outputs.push_back(temp);
+        }
+        if(activation == "tanh")
+        {
+            outputs.push_back(temp.tanh());
+        }
+        if(activation == "relu")
+        {
+            outputs.push_back(temp.relu());
+        }
+    }
+    return outputs;
+}
+
+void Layer::train(float lr)
+{
+    for(auto& p: p_vec)
+    {
+        p.train(lr);
+    }
+}
+
+void Layer::zero_grad()
+{
+    for(auto& p: p_vec)
+    {
+        p.zero_grad();
+    }
+}
+
+void Layer::info()
+{
+    std::cout << "Number of perceptron = " << p_vec.size() << std::endl;
+    std::cout << "Activation function = " << activation << std::endl;
+}
+
+// Neural Network
+
+std::vector<Value> NN::forward(const std::vector<Value>& inputs)
+{
+    if(l_vec.empty())
+    {
+        return inputs;
+    }
+    std::vector<Value> temp = inputs;
+    std::vector<Value> outputs;
+
+    for(auto& layer:l_vec)
+    {
+        outputs = layer.forward(temp);
+        temp = outputs;
+    }
+    return outputs;
+}
+
+void NN::train(float lr)
+{
+    for(auto& layer: l_vec)
+    {
+        layer.train(lr);
+    }
+}
+
+void NN::zero_grad()
+{
+    for(auto& layer: l_vec)
+    {
+        layer.zero_grad();
+    }
+}
+
+void NN::info()
+{
+    std::cout << "Number of layer = " << l_vec.size() << std::endl;
+}
+
