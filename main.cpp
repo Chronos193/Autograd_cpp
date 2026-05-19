@@ -1,7 +1,7 @@
 #include "Value.h"
 #include "visualize.h"
 #include "perceptron.h"
-
+#include "dataset.h"
 std::vector<std::pair<std::vector<Value>, Value>> data()
 {
     std::vector<std::pair<std::vector<Value>, Value>> data_arr;
@@ -93,51 +93,19 @@ Value mae_loss(Value y, Value y_pred)
 
 
 int main() {
-    //Hyperparameters
-    float lr = 0.003;
-    int epochs = 300;
-    int input = 2;
-    int layer1 = 4;
-    int layer2 = 4;
-    int output = 1;
-    //
-    NN n1(input, {"leaky_relu", "leaky_relu", "linear"}, {layer1, layer2, output});
-    auto data_vec = data();
-    for (int i=0;i<epochs;i++)
+    CSVDataset dataset("data.csv", {0,1}, {2,3});
+    dataset.info();
+    std::pair<std::vector<Value>,std::vector<Value>> out = dataset.get(1);
+    std::cout << "X :- " << " ";
+    for(auto ele: out.first)
     {
-        std::vector<Value> Y;
-        std::vector<Value> Y_pred;  // Need to scope it here so that the computation graph built is destroyed and memory is freed
-        Y.reserve(data_vec.size());
-        Y_pred.reserve(data_vec.size()); // Pre-allocate for faster use later
-        // ================Forward Pass============
-        for(auto& data: data_vec)
-        {
-            std::vector<Value> outputs;
-            outputs = n1.forward(data.first);
-            Y_pred.push_back(outputs[0]);
-            Y.push_back(data.second);
-        }
-        Value loss = mae_loss(autograd::utils::zip(Y_pred, Y));
-        // =====================Backward Pass==============
-        n1.zero_grad();
-        loss.backward();
-        n1.train(lr);
-        // ==============Printing===============
-        if (i%50 == 0)
-        {
-            std::cout << loss << std::endl;
-            autograd::utils::draw_graph(loss);
-        }
+        std::cout << ele << " ";
     }
-    std::cout << "4" << std::endl;
-    // Validation
-    std::vector<Value> val_in = {3,4};
-    Value y(7);
-    std::vector<Value> val_out;
-    val_out = n1.forward(val_in);
-    Value val_loss = mae_loss(val_out[0], y); 
     std::cout << std::endl;
-    std:: cout << "Validation output = " << val_out[0] << ", Validation Loss = " <<  val_loss << std::endl;
-
+    std::cout << "Y :- " << " ";
+    for(auto ele: out.second)
+    {
+        std::cout << ele << " ";
+    }
     return 0;
 }

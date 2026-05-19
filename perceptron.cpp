@@ -5,7 +5,8 @@ Value Perceptron::forward(const std::vector<Value>& inputs)
 {
     if(inputs.size() != weights.size())
     {
-        throw std::runtime_error("Input size mismatch");
+        throw std::runtime_error("Input size mismatch right here in perceptron foward: inputs size = " 
+                                 + std::to_string(inputs.size()) + ", weights size = " + std::to_string(weights.size()));
     }
     Value sum = bias;
     for (size_t i = 0; i < weights.size(); i++)
@@ -86,6 +87,10 @@ std::vector<Value> Layer::forward(const std::vector<Value>& inputs, const float 
         {
             outputs.push_back(temp.leaky_relu(alpha));
         }
+        else if(activation == "elu")
+        {
+            outputs.push_back(temp.elu(alpha));
+        }
         else
         {
             outputs.push_back(temp);
@@ -131,14 +136,20 @@ std::vector<Value> NN::forward(const std::vector<Value>& inputs)
     }
     std::vector<Value> temp = inputs;
     std::vector<Value> outputs;
-    float alpha = 0.01;
+    float alpha_lrelu = 0.01;
+    float alpha_elu = 1.0;
 
     for(size_t i=0;i<l_vec.size();i++)
     {
         if(acti_vec[i] == "leaky_relu")
         {
 
-            outputs = l_vec[i].forward(temp, alpha);
+            outputs = l_vec[i].forward(temp, alpha_lrelu);
+            temp = outputs;
+        }
+        else if(acti_vec[i] == "elu")
+        {
+            outputs = l_vec[i].forward(temp, alpha_elu);
             temp = outputs;
         }
         else
@@ -166,7 +177,7 @@ std::vector<Value> NN::forward(const std::vector<Value>& inputs, const std::vect
     size_t count = 0;
     for(auto& acti: acti_vec)
     {
-        if(acti == "leaky_relu")
+        if((acti == "leaky_relu") || (acti == "elu"))
         {
             count++;
         }
@@ -183,7 +194,7 @@ std::vector<Value> NN::forward(const std::vector<Value>& inputs, const std::vect
 
     for(size_t i=0;i<l_vec.size();i++)
     {
-        if(acti_vec[i] == "leaky_relu")
+        if((acti_vec[i] == "leaky_relu") || (acti_vec[i] == "elu"))
         {
             alpha = alpha_vec[j++];
             outputs = l_vec[i].forward(temp, alpha);
