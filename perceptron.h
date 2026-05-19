@@ -1,5 +1,5 @@
 #include "Value.h"
-#include "Visualize.h"
+#include "utils.h"
 #include <random>
 
 class Perceptron

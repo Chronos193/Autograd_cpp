@@ -1,5 +1,5 @@
 #include "Value.h"
-#include "visualize.h"
+#include "utils.h"
 #include "perceptron.h"
 
 std::vector<std::pair<std::vector<Value>, Value>> data()

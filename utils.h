@@ -1,5 +1,5 @@
-#ifndef VISUALIZE_H
-#define VISUALIZE_H
+#ifndef utils_H
+#define utils_H
 
 #include "Value.h"
 
@@ -15,6 +15,14 @@ namespace autograd::utils {
     void return_all_nodes(Value node, std::vector<Value>& node_arr);
 
     std::vector<std::pair<Value, Value>> zip(std::vector<Value> v1, std::vector<Value> v2);
+
+    Value mse_loss(const std::vector<std::pair<Value, Value>>& arr);
+
+    Value mse_loss(Value y, Value y_pred);
+
+    Value mae_loss(const std::vector<std::pair<Value, Value>>& arr);
+
+    Value mae_loss(Value y, Value y_pred);
 }
 
 #endif

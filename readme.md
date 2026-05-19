@@ -70,7 +70,7 @@ make
 ./my_autograd.exe
 ```
 
-To visualize the computation graph (needs [Graphviz](https://graphviz.org/) installed):
+To utils the computation graph (needs [Graphviz](https://graphviz.org/) installed):
 
 ```bash
 make png
@@ -83,7 +83,7 @@ This generates `my_network.png` from the `.dot` file.
 ```
 ├── Value.h / Value.cpp       # Core autograd engine (Value + ValueImpl)
 ├── perceptron.h / .cpp        # Neural network components (Perceptron, Layer, NN)
-├── Visualize.h / .cpp         # Computation graph visualization
+├── utils.h / .cpp         # Computation graph visualization
 ├── main.cpp                   # Training example
 ├── test/                      # Test files
 │   ├── leaky_relu_test.cpp

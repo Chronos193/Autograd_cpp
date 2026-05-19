@@ -1,4 +1,4 @@
-#include "visualize.h"
+#include "utils.h"
 
 namespace autograd::utils {
     void build_trace(std::shared_ptr<ValueImpl> root, 
@@ -73,5 +73,57 @@ namespace autograd::utils {
             zip_arr.push_back(p);
         }
         return zip_arr;
+    }
+
+    Value mse_loss(const std::vector<std::pair<Value, Value>>& arr)
+    {
+        Value loss(0);
+        for(auto ele: arr)
+        {
+            loss = loss + (ele.first-ele.second)*(ele.first-ele.second);
+        }
+        Value total_ele(arr.size());
+        loss = loss/total_ele;
+        return loss;
+    }
+
+    Value mse_loss(Value y, Value y_pred)
+    {
+        Value loss = (y-y_pred)*(y-y_pred);
+        return loss;
+    }
+
+
+    Value mae_loss(const std::vector<std::pair<Value, Value>>& arr)
+    {
+        Value loss(0);
+        for(auto ele: arr)
+        {
+            if(ele.first.get_data() > ele.second.get_data())
+            {
+                loss = loss + (ele.first-ele.second);
+            }
+            else
+            {
+                loss = loss + (ele.second-ele.first);
+            }
+        }
+        Value total_ele(arr.size());
+        loss = loss/total_ele;
+        return loss;
+    }
+
+    Value mae_loss(Value y, Value y_pred)
+    {
+        Value loss;
+        if(y.get_data()>y_pred.get_data())
+        {
+            loss = (y-y_pred);
+        }
+        else
+        {
+            loss = (y_pred-y);
+        }
+        return loss;
     }
 }
