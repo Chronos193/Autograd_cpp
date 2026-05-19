@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall
+CXXFLAGS = -std=c++17 -Wall 
 
 OBJS = main.o Value.o Visualize.o perceptron.o
 TARGET = my_autograd.exe

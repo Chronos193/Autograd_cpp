@@ -60,6 +60,8 @@ class Layer
 
         std::vector<Value> forward(const std::vector<Value>& inputs); // Call all perceptron on same inputs vec by looping and then pass through activation
 
+        std::vector<Value> forward(const std::vector<Value>& inputs, const float alpha);
+
         void train(float lr); // Call on all perceptron in array
 
         void zero_grad(); // Call on all perceptron in array
@@ -91,6 +93,7 @@ class NN
             {
                 throw std::runtime_error("Activations size mismatch");
             }
+            this->acti_vec = acti_vec;
             int prev = input_size;
             int i=0;
             for(int size : layer_sizes)
@@ -102,6 +105,8 @@ class NN
         }
 
         std::vector<Value> forward(const std::vector<Value>& inputs);
+
+        std::vector<Value> forward(const std::vector<Value>& inputs, const std::vector<float>& alpha_vec);
 
         void train(float lr);
 

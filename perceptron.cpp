@@ -75,6 +75,25 @@ std::vector<Value> Layer::forward(const std::vector<Value>& inputs)
     return outputs;
 }
 
+std::vector<Value> Layer::forward(const std::vector<Value>& inputs, const float alpha)
+{
+    std::vector<Value> outputs;
+    outputs.reserve(p_vec.size());
+    for( auto& p : p_vec)
+    {
+        Value temp = p.forward(inputs);
+        if(activation == "leaky_relu")
+        {
+            outputs.push_back(temp.leaky_relu(alpha));
+        }
+        else
+        {
+            outputs.push_back(temp);
+        }
+    }
+    return outputs;
+}
+
 void Layer::train(float lr)
 {
     for(auto& p: p_vec)
@@ -105,13 +124,77 @@ std::vector<Value> NN::forward(const std::vector<Value>& inputs)
     {
         return inputs;
     }
+    if (acti_vec.size() != l_vec.size())
+    {
+        throw std::runtime_error(
+            "Mismatch between layers and activation vector in first forward instance");
+    }
     std::vector<Value> temp = inputs;
     std::vector<Value> outputs;
+    float alpha = 0.01;
 
-    for(auto& layer:l_vec)
+    for(size_t i=0;i<l_vec.size();i++)
     {
-        outputs = layer.forward(temp);
-        temp = outputs;
+        if(acti_vec[i] == "leaky_relu")
+        {
+
+            outputs = l_vec[i].forward(temp, alpha);
+            temp = outputs;
+        }
+        else
+        {
+            outputs = l_vec[i].forward(temp);
+            temp = outputs;
+        }
+
+    }
+    return outputs;
+}
+
+std::vector<Value> NN::forward(const std::vector<Value>& inputs, const std::vector<float>& alpha_vec)
+{
+    if(l_vec.empty())
+    {
+        return inputs;
+    }
+    // ===============Error Handling==============
+    if (acti_vec.size() != l_vec.size())
+    {
+        throw std::runtime_error(
+            "Mismatch between layers and activation vector for second forward instance");
+    }
+    size_t count = 0;
+    for(auto& acti: acti_vec)
+    {
+        if(acti == "leaky_relu")
+        {
+            count++;
+        }
+    }
+    if(alpha_vec.size() != count)
+    {
+        throw std::runtime_error("Size mismatch between alpha and activation which needs it");
+    }
+    // ========================================================
+    std::vector<Value> temp = inputs;
+    std::vector<Value> outputs;
+    int j=0;
+    float alpha;
+
+    for(size_t i=0;i<l_vec.size();i++)
+    {
+        if(acti_vec[i] == "leaky_relu")
+        {
+            alpha = alpha_vec[j++];
+            outputs = l_vec[i].forward(temp, alpha);
+            temp = outputs;
+        }
+        else
+        {
+            outputs = l_vec[i].forward(temp);
+            temp = outputs;
+        }
+
     }
     return outputs;
 }

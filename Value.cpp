@@ -229,6 +229,29 @@ std::shared_ptr<ValueImpl> ValueImpl::relu()
     return out;
 }
 
+std::shared_ptr<ValueImpl> ValueImpl::leaky_relu(float alpha)
+{
+    float new_data;
+    if (this->data >= 0) {new_data = (this->data);}
+    else {new_data = alpha*(this->data);}
+    std::vector<std::shared_ptr<ValueImpl>> children;
+    std::shared_ptr<ValueImpl> child1 = shared_from_this();
+    children.push_back(child1);
+    std::shared_ptr<ValueImpl> out = std::make_shared<ValueImpl> (new_data, children , op);
+    out -> op = "leaky_relu";
+    std::weak_ptr<ValueImpl> out_weak = out;     // As here if we pass shared pointer to _backward the _backward will own out and out will own _backward so memory leak will happen
+    out -> _backward = [child1, out_weak, alpha](){
+        if (auto out_ptr = out_weak.lock())
+        {
+            float grad1 = child1->get_grad(); 
+            if (out_ptr->get_data() > 0) {grad1 += 1.0f * out_ptr->get_grad() ;}
+            else {grad1 += alpha * out_ptr->get_grad();}
+            child1->set_grad(grad1);
+        }
+    };
+    return out;
+}
+
 std::shared_ptr<ValueImpl> ValueImpl::exp()
 {
     float new_data = std::exp(this->data);

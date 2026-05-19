@@ -1,0 +1,77 @@
+Using {"leaky_relu", "leaky_relu", "linear"}
+
+Value(data=30.0171, grad=1)
+Graph saved to my_network.dot
+Value(data=0.048914, grad=1)
+Graph saved to my_network.dot
+Value(data=0.0390337, grad=1)
+Graph saved to my_network.dot
+Value(data=0.0202834, grad=1)
+Graph saved to my_network.dot
+Value(data=0.0141196, grad=1)
+Graph saved to my_network.dot
+Value(data=0.0111616, grad=1)
+Graph saved to my_network.dot
+4
+
+Validation output = Value(data=6.83417, grad=0), Validation Loss = Value(data=0.0274995, grad=0)
+PS E:\Autograd_c++> 
+
+Using {"relu", "relu", "linear"}
+
+Value(data=30.4555, grad=1)
+Graph saved to my_network.dot
+Value(data=0.0423741, grad=1)
+Graph saved to my_network.dot
+Value(data=0.0331519, grad=1)
+Graph saved to my_network.dot
+Value(data=0.026418, grad=1)
+Graph saved to my_network.dot
+Value(data=0.0213068, grad=1)
+Graph saved to my_network.dot
+Value(data=0.0173264, grad=1)
+Graph saved to my_network.dot
+4
+
+Validation output = Value(data=6.60176, grad=0), Validation Loss = Value(data=0.158592, grad=0)
+
+Using {"tanh", "tanh", "linear"}
+
+Value(data=40.5051, grad=1)
+Graph saved to my_network.dot
+Value(data=2.30829, grad=1)
+Graph saved to my_network.dot
+Value(data=2.04243, grad=1)
+Graph saved to my_network.dot
+Value(data=1.49234, grad=1)
+Graph saved to my_network.dot
+Value(data=0.63891, grad=1)
+Graph saved to my_network.dot
+Value(data=0.469114, grad=1)
+Graph saved to my_network.dot
+4
+
+Validation output = Value(data=5.2607, grad=0), Validation Loss = Value(data=3.02518, grad=0)
+
+
+========================MAE LOSS=================================
+
+Using {"leaky_relu", "leaky_relu", "linear"}
+
+PS E:\Autograd_c++> ./my_autograd.exe
+Value(data=6.1395, grad=1)
+Graph saved to my_network.dot
+Value(data=2.62243, grad=1)
+Graph saved to my_network.dot
+Value(data=0.61312, grad=1)
+Graph saved to my_network.dot
+Value(data=0.135423, grad=1)
+Graph saved to my_network.dot
+Value(data=0.125156, grad=1)
+Graph saved to my_network.dot
+Value(data=0.102543, grad=1)
+Graph saved to my_network.dot
+4
+
+Validation output = Value(data=6.84964, grad=0), Validation Loss = Value(data=0.150363, grad=0)
+

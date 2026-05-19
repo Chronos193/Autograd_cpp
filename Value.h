@@ -52,6 +52,7 @@ class ValueImpl: public std::enable_shared_from_this<ValueImpl>
         std::shared_ptr<ValueImpl> relu();
         std::shared_ptr<ValueImpl> tanh();
         std::shared_ptr<ValueImpl> exp();
+        std::shared_ptr<ValueImpl> leaky_relu(float alpha);
 };
 
 // Writing the wrapper around Value Implementaion
@@ -135,6 +136,11 @@ class Value
         Value relu() const
         {
             return Value(impl->relu());
+        }
+
+        Value leaky_relu(float alpha) const
+        {
+            return Value(impl->leaky_relu(alpha));
         }
 
         Value tanh() const
