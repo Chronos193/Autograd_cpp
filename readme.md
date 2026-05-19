@@ -67,7 +67,7 @@ Requires C++17 and `g++`. Just run:
 
 ```bash
 make
-./my_autograd.exe
+./bin/my_autograd.exe
 ```
 
 To utils the computation graph (needs [Graphviz](https://graphviz.org/) installed):
@@ -81,10 +81,20 @@ This generates `my_network.png` from the `.dot` file.
 ## Project structure
 
 ```
-├── Value.h / Value.cpp       # Core autograd engine (Value + ValueImpl)
-├── perceptron.h / .cpp        # Neural network components (Perceptron, Layer, NN)
-├── utils.h / .cpp         # Computation graph visualization
-├── main.cpp                   # Training example
+├── src/                       # Source files (.cpp)
+│   ├── Value.cpp              # Core autograd engine
+│   ├── perceptron.cpp         # Neural network components
+│   ├── utils.cpp              # Computation graph visualization
+│   ├── dataset.cpp            # Dataset handling
+│   └── main.cpp               # Training example
+├── include/                   # Header files (.h)
+│   ├── Value.h
+│   ├── perceptron.h
+│   ├── utils.h
+│   ├── dataset.h
+│   └── rapidcsv.h             # CSV parsing library
+├── data/                      # Datasets
+│   └── Xor_Dataset.csv
 ├── test/                      # Test files
 │   ├── leaky_relu_test.cpp
 │   └── nn_test.cpp
@@ -93,24 +103,40 @@ This generates `my_network.png` from the `.dot` file.
 
 ## Sample output
 
-Training a small network on simple addition data for 300 epochs:
+Training a small network on XOR dataset for 100 epochs:
 
 ```
-Value(data=3.59729, grad=1)
-Value(data=1.67602, grad=1)
-Value(data=0.494854, grad=1)
-Value(data=0.158523, grad=1)
-Value(data=0.10869, grad=1)
-Value(data=0.0833275, grad=1)
+Trained on XOR_Dataset from 
+url = "https://www.kaggle.com/datasets/bipinmaharjan/xor-dataset/versions/1?resource=download"
 
-Validation output = Value(data=6.69359, grad=0), Validation Loss = Value(data=0.306412, grad=0)
+Using     
+    int batch_size=32;
+    int layer1 = 3;
+    int layer2 = 3;
+    int out_layer = 1;
+    size_t epochs = 100;
+    float lr = 0.01;
+    float train_size = 0.90; // Portion of data used in training rest is used in testing.
+
+Got Results
+    Value(data=0.675301, grad=1)
+    Value(data=0.178561, grad=1)
+    Value(data=0.0450419, grad=1)
+    Value(data=0.0225882, grad=1)
+    Value(data=0.0145437, grad=1)
+    Value(data=0.0105704, grad=1)
+    Value(data=0.00824065, grad=1)
+    Value(data=0.00672519, grad=1)
+    Value(data=0.0056649, grad=1)
+    Value(data=0.00488417, grad=1)
+    Validation Loss is :- 0.00596749
 ```
 
-The loss goes down and the network learns to approximate addition, which is pretty cool for something built from scratch.
+The loss goes down and the network learns to approximate the XOR function.
 
 ## Limitations
 
-- Everything is scalar-based, so it's slow compared to real frameworks that use tensors and matrix operations. This is meant for learning, not for training actual models.
+- Everything is scalar-based, so it's slow compared to real frameworks that use tensors and matrix operations.
 - Only supports simple SGD for optimization (no Adam, momentum, etc.).
 - No GPU support yet(sadly).
 
