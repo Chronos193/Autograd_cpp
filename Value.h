@@ -54,6 +54,8 @@ class ValueImpl: public std::enable_shared_from_this<ValueImpl>
         std::shared_ptr<ValueImpl> exp();
         std::shared_ptr<ValueImpl> leaky_relu(float alpha);
         std::shared_ptr<ValueImpl> elu(float alpha);
+        std::shared_ptr<ValueImpl> ln();
+        std::shared_ptr<ValueImpl> sigmoid();
 };
 
 // Writing the wrapper around Value Implementaion
@@ -156,6 +158,14 @@ class Value
         Value elu(float alpha) const
         {
             return Value(impl->elu(alpha));
+        }
+        Value ln() const
+        {
+            return Value(impl->ln());
+        }
+        Value sigmoid() const
+        {
+            return Value(impl->sigmoid());
         }
 };
 

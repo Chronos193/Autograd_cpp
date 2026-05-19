@@ -23,6 +23,10 @@ namespace autograd::utils {
     Value mae_loss(const std::vector<std::pair<Value, Value>>& arr);
 
     Value mae_loss(Value y, Value y_pred);
+
+    Value bce_loss(const std::vector<std::pair<Value, Value>>& arr);
+
+    Value bce_loss(Value y, Value y_pred);
 }
 
 #endif

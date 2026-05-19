@@ -294,3 +294,49 @@ std::shared_ptr<ValueImpl> ValueImpl::elu(float alpha)
     };
     return out;
 }
+
+
+std::shared_ptr<ValueImpl> ValueImpl::ln()
+{
+    float new_data = std::log(this->data);
+    if (data <= 0)
+        throw std::domain_error("ln undefined for x <= 0");
+    std::vector<std::shared_ptr<ValueImpl>> children;
+    std::shared_ptr<ValueImpl> child1 = shared_from_this();
+    children.push_back(child1);
+    std::shared_ptr<ValueImpl> out = std::make_shared<ValueImpl> (new_data, children , op);
+    out -> op = "ln";
+    std::weak_ptr<ValueImpl> out_weak = out;     // As here if we pass shared pointer to _backward the _backward will own out and out will own _backward so memory leak will happen
+    out -> _backward = [ child1, out_weak](){
+        if (auto out_ptr = out_weak.lock())
+        {
+            float grad1 = child1->get_grad(); 
+            grad1 += 1/(child1->get_data()) * out_ptr->get_grad() ;
+            child1->set_grad(grad1);
+        }
+    };
+    return out;
+}
+
+std::shared_ptr<ValueImpl> ValueImpl::sigmoid()
+{
+    float sig = 1.0f / (1.0f + std::exp(-data));
+    std::shared_ptr<ValueImpl> child = shared_from_this();
+    std::vector<std::shared_ptr<ValueImpl>> children;
+    children.push_back(child);
+    std::shared_ptr<ValueImpl> out =
+        std::make_shared<ValueImpl>(sig, children, "sigmoid");
+    std::weak_ptr<ValueImpl> out_weak = out;
+    out->_backward = [child, out_weak]()
+    {
+        if (auto out_ptr = out_weak.lock())
+        {
+            float grad = child->get_grad();
+            float s = out_ptr->get_data();
+            grad += (s * (1.0f - s)) * out_ptr->get_grad();
+            child->set_grad(grad);
+        }
+    };
+
+    return out;
+}

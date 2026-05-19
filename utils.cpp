@@ -126,4 +126,25 @@ namespace autograd::utils {
         }
         return loss;
     }
+    Value bce_loss(const std::vector<std::pair<Value, Value>>& arr)
+    {
+        Value loss(0);
+        Value one(1);
+        Value neg(-1);
+        for(auto ele: arr)
+        {
+            loss = loss + (((ele.first)*(ele.second.ln()) + (one-ele.first)*((one - ele.second).ln())));
+        }
+        Value total_ele(arr.size());
+        loss = neg*loss/total_ele;
+        return loss;
+    }
+    Value bce_loss(Value y, Value y_pred)
+    {
+        Value loss(0);
+        Value one(1);
+        Value neg(-1);
+        loss = neg*(((y)*(y_pred.ln()) + (one-y)*((one - y_pred).ln())));
+        return loss;
+    }
 }

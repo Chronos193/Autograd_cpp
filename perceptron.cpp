@@ -64,13 +64,17 @@ std::vector<Value> Layer::forward(const std::vector<Value>& inputs)
         {
             outputs.push_back(temp);
         }
-        if(activation == "tanh")
+        else if(activation == "tanh")
         {
             outputs.push_back(temp.tanh());
         }
-        if(activation == "relu")
+        else if(activation == "relu")
         {
             outputs.push_back(temp.relu());
+        }
+        else if(activation == "sigmoid")
+        {
+            outputs.push_back(temp.sigmoid());
         }
     }
     return outputs;
