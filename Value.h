@@ -31,7 +31,7 @@ class ValueImpl: public std::enable_shared_from_this<ValueImpl>
         // Getters
         float get_data() const;
         float get_grad() const;
-        const std::vector<std::shared_ptr<ValueImpl>>&  get_childen() const;
+        const std::vector<std::shared_ptr<ValueImpl>>&  get_children() const;
         std::string get_op() const;
 
         // Setters

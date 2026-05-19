@@ -8,7 +8,7 @@ namespace autograd::utils {
         // If we haven't seen this node yet
         if (nodes.find(root) == nodes.end()) {
             nodes.insert(root);
-            for (const auto& child : root->get_childen()) {
+            for (const auto& child : root->get_children()) {
                 edges.insert({child, root}); // Record the connection
                 build_trace(child, nodes, edges);
             }
@@ -52,7 +52,7 @@ namespace autograd::utils {
     void return_all_nodes(Value node, std::vector<Value>& node_arr)
     {
         std::shared_ptr<ValueImpl> node_ptr = node._return_shared_pointer();
-        auto children = node_ptr->get_childen();
+        auto children = node_ptr->get_children();
         for(const auto& child_ptr: children)
         {
             Value child(child_ptr);

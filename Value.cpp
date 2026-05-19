@@ -22,7 +22,7 @@ float ValueImpl::get_grad() const
     return grad;
 }
 
-const std::vector<std::shared_ptr<ValueImpl>>&  ValueImpl::get_childen() const
+const std::vector<std::shared_ptr<ValueImpl>>&  ValueImpl::get_children() const
 {
     return children_arr;
 }
@@ -66,7 +66,7 @@ void ValueImpl::backward()
             visited.insert(node); // Mark as visited
             
             // Visit all children first
-            for (const auto& child : node->get_childen()) {
+            for (const auto& child : node->get_children()) {
                 build_topo(child, visited, topo);
             }
             
