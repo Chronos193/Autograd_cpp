@@ -56,6 +56,7 @@ class ValueImpl: public std::enable_shared_from_this<ValueImpl>
         std::shared_ptr<ValueImpl> elu(float alpha);
         std::shared_ptr<ValueImpl> ln();
         std::shared_ptr<ValueImpl> sigmoid();
+        std::shared_ptr<ValueImpl> clamp(float min_val, float max_val);
 };
 
 // Writing the wrapper around Value Implementaion
@@ -166,6 +167,10 @@ class Value
         Value sigmoid() const
         {
             return Value(impl->sigmoid());
+        }
+        Value clamp(float min_val, float max_val) const
+        {
+            return Value(impl->clamp(min_val, max_val));
         }
 };
 

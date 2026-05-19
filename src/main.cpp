@@ -9,7 +9,7 @@ int main() {
     int layer1 = 3;
     int layer2 = 3;
     int out_layer = 1;
-    size_t epochs = 50;
+    size_t epochs = 100;
     float lr = 0.01;
     float train_size = 0.90;
     //
@@ -31,7 +31,7 @@ int main() {
                 auto Y_pred = xor_net.forward(data.first);
                 for(size_t i=0;i<Y_pred.size();i++)
                 {
-                    Y_pred[i] = (Y_pred[i] + Value(1))/Value(2);
+                    Y_pred[i] = ((Y_pred[i] + Value(1))/Value(2)).clamp(1e-7f, 1.0f - 1e-7f);
                 }
                 auto zipped_vec = autograd::utils::zip(data.second, Y_pred);
                 loss = loss + autograd::utils::bce_loss(zipped_vec);
@@ -56,6 +56,10 @@ int main() {
         for(const auto& data: batch)
         {
             auto Y_pred = xor_net.forward(data.first);
+            for(size_t i=0;i<Y_pred.size();i++)
+            {
+                Y_pred[i] = ((Y_pred[i] + Value(1))/Value(2)).clamp(1e-7f, 1.0f - 1e-7f);
+            }
             auto zipped_vec = autograd::utils::zip(data.second, Y_pred);
             val_loss = val_loss + autograd::utils::bce_loss(zipped_vec);
         }

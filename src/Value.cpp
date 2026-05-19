@@ -340,3 +340,28 @@ std::shared_ptr<ValueImpl> ValueImpl::sigmoid()
 
     return out;
 }
+
+std::shared_ptr<ValueImpl> ValueImpl::clamp(float min_val, float max_val)
+{
+    float new_data;
+    if (this->data < min_val) new_data = min_val;
+    else if (this->data > max_val) new_data = max_val;
+    else new_data = this->data;
+
+    std::vector<std::shared_ptr<ValueImpl>> children;
+    std::shared_ptr<ValueImpl> child1 = shared_from_this();
+    children.push_back(child1);
+    std::shared_ptr<ValueImpl> out = std::make_shared<ValueImpl> (new_data, children , "clamp");
+    std::weak_ptr<ValueImpl> out_weak = out;
+    out -> _backward = [child1, out_weak, min_val, max_val](){
+        if (auto out_ptr = out_weak.lock())
+        {
+            float grad1 = child1->get_grad(); 
+            if (child1->get_data() > min_val && child1->get_data() < max_val) {
+                grad1 += 1.0f * out_ptr->get_grad();
+            }
+            child1->set_grad(grad1);
+        }
+    };
+    return out;
+}
