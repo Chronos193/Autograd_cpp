@@ -9,7 +9,7 @@ BINDIR = bin
 SRCS = $(wildcard $(SRCDIR)/*.cpp)
 OBJS = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SRCS))
 TARGET = $(BINDIR)/my_autograd.exe
-EXTRA_DOT = my_network.dot 
+EXTRA_DOT = ./bin/my_network.dot 
 EXTRA_PNG = my_network.png
 
 $(TARGET): $(OBJS) | $(BINDIR)

@@ -1,15 +1,15 @@
 # Autograd C++
 
-A small automatic differentiation engine and neural network library built from scratch in C++. Inspired by Andrej Karpathy's [micrograd](https://github.com/karpathy/micrograd).
+This is a small automatic differentiation engine built from scratch in C++. Inspired by Andrej Karpathy's [micrograd](https://github.com/karpathy/micrograd).
 
-The whole point of this project was to understand how backpropagation and autograd actually work under the hood, instead of just using PyTorch as a black box.
+The whole point of this project was to understand how backpropagation and autograd actually work under the hood, instead of just using PyTorch as a black box and also to practice my OOPS and C++ programming skills.
 
 ## What it does
 
-- **Scalar autograd engine** — A `Value` class that tracks computations and builds a dynamic computation graph as you do math operations on it.
-- **Backpropagation** — Computes gradients automatically using reverse-mode autodiff with a topological sort over the graph.
+- **Scalar autograd engine** — A `Value` class is implemented using shared_pointers that tracks computations and builds a dynamic computation graph as you do math operations on it.
+- **Backpropagation** — It computes gradients automatically using reverse-mode autodifferentiation with a topological sort over the graph(using DFS).
 - **Neural network module** — `Perceptron`, `Layer`, and `NN` classes to build and train simple feedforward networks.
-- **Graph visualization** — Exports the computation graph to Graphviz `.dot` format so you can actually see what's going on.
+- **Graph visualization** — Exports the computation graph to Graphviz `.dot` format so you can actually see what's going on.(I used Graphviz because it was used in micrograd too.)
 
 ## Supported operations
 
@@ -19,7 +19,21 @@ The whole point of this project was to understand how backpropagation and autogr
 | `tanh` | ✓ |
 | `relu` | ✓ |
 | `leaky_relu` | ✓ |
-| `exp` | ✓ |
+| `exp` | ✓ |## Benchmark: C++ Autograd Engine vs PyTorch (CPU)
+
+To evaluate the performance of the custom scalar-based autograd engine, I benchmarked it against an equivalent implementation written in PyTorch running on CPU. Both models were trained on the XOR dataset for 10 epochs.
+
+| Metric | Autograd C++ | PyTorch (CPU) |
+|----------|-------------|---------------|
+| Training Time | 7.30 s | 2.43 s |
+| Validation Time | 0.05 s | 0.006 s |
+| Total Execution Time | 7.36 s | 9.57 s |
+
+### Observations
+- PyTorch achieves significantly faster training and validation due to highly optimized tensor operations and backend libraries.
+- The custom C++ engine incurs overhead from operating on individual scalar nodes and constructing a dynamic computation graph.
+- Despite slower training, the custom implementation provides valuable insight into the internal mechanics of automatic differentiation and backpropagation.
+- The higher total execution time reported for PyTorch includes framework initialization and setup overhead, whereas the C++ implementation has a lower startup cost.
 
 ## How it works
 
@@ -134,14 +148,32 @@ Got Results
 
 The loss goes down and the network learns to approximate the XOR function.
 
+
+## Benchmark: C++ Autograd Engine vs PyTorch (CPU)
+
+To evaluate the performance of the custom scalar-based autograd engine, I benchmarked it against an equivalent implementation written in PyTorch running on CPU. Both models were trained on the XOR dataset for 10 epochs.
+
+| Metric | Autograd C++ | PyTorch (CPU) |
+|----------|-------------|---------------|
+| Training Time | 7.30 s | 2.43 s |
+| Validation Time | 0.05 s | 0.006 s |
+| Total Execution Time | 7.36 s | 9.57 s |
+
+### Observations
+- PyTorch achieves significantly faster training and validation due to highly optimized tensor operations and backend libraries.(Unlike my scalar implementation)
+- The custom C++ engine incurs overhead from operating on individual scalar nodes and constructing a dynamic computation graph.
+- Despite slower training, the custom implementation provides valuable insight into the internal mechanics of automatic differentiation and backpropagation.
+- The higher total execution time reported for PyTorch includes framework initialization and setup overhead, whereas the C++ implementation has a lower startup cost.( This is the cost of using Python. )
+
 ## Limitations
 
-- Everything is scalar-based, so it's slow compared to real frameworks that use tensors and matrix operations.
+- Everything is scalar-based(no tensor implementaion), so it's slow compared to real frameworks that use tensors and matrix operations.
 - Only supports simple SGD for optimization (no Adam, momentum, etc.).
-- No GPU support yet(sadly).
+- No GPU support yet.
 
 ## What I learned
 
+- Some OOPS concepts
 - How reverse automatic differentiation works at a low level
 - Managing memory in C++ with smart pointers, especially avoiding circular references between `shared_ptr` and lambda captures
 - How the chain rule translates into actual code
